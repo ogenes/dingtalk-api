@@ -1,0 +1,30 @@
+{
+  "name": "dingtalk-api",
+  "version": "1.0.0",
+  "description": "钉钉API调用技能 - 支持用户搜索、部门管理等功能",
+  "main": "index.js",
+  "scripts": {
+    "search-user": "ts-node scripts/search-user.ts",
+    "update-skill": "node scripts/update-skill-doc.js",
+    "setup-hooks": "sh scripts/setup-hooks.sh",
+    "precommit": "npm run update-skill && git add SKILL.md"
+  },
+  "keywords": [
+    "dingtalk",
+    "api",
+    "skill"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@alicloud/dingtalk": "^2.0.0",
+    "@alicloud/openapi-client": "^0.4.6",
+    "@alicloud/tea-typescript": "^1.7.1",
+    "@alicloud/tea-util": "^1.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
