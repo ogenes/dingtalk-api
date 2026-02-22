@@ -180,5 +180,4 @@ MIT
 - ClawHub: https://clawhub.com/ogenes/dingtalk-api
 
 ### 发布到 Clawhub
-clawhub publish /Users/ogenes/Data/www/dingtalk-api --
-slug dingtalk-api --name "DingTalk API" --version 1.0.1 --changelog "钉钉API技能 - 更新reamme文档"
+clawhub publish /Users/ogenes/Data/www/dingtalk-api --slug dingtalk-api --name "DingTalk API" --version 1.0.3 --changelog "钉钉API技能 - 更新reamme文档"

@@ -1,6 +1,6 @@
 {
   "name": "dingtalk-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "钉钉API调用技能，支持 获取企业内部应用的accessToken、搜索用户userId 等功能。",
   "main": "index.js",
   "scripts": {
