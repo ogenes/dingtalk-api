@@ -23,15 +23,19 @@
 #### 1. 安装 ClawHub CLI
 
 ```bash
+#安装
 npm install -g clawhub
+
+#校验
+clawhub search dingtalk-api
 ```
 
 #### 2. 安装 DingTalk API Skill
 
 ```bash
 # 安装最新版本
-clawhub install dingtalk-api
 
+clawhub install dingtalk-api
 # 或安装指定版本
 clawhub install dingtalk-api --version 1.0.0
 ```
@@ -175,3 +179,6 @@ MIT
 - GitHub: https://github.com/ogenes/dingtalk-api
 - ClawHub: https://clawhub.com/ogenes/dingtalk-api
 
+### 发布到 Clawhub
+clawhub publish /Users/ogenes/Data/www/dingtalk-api --
+slug dingtalk-api --name "DingTalk API" --version 1.0.1 --changelog "钉钉API技能 - 更新reamme文档"

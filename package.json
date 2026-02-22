@@ -1,13 +1,11 @@
 {
   "name": "dingtalk-api",
-  "version": "1.0.0",
-  "description": "钉钉API调用技能 - 支持用户搜索、部门管理等功能",
+  "version": "1.0.2",
+  "description": "钉钉API调用技能，支持 获取企业内部应用的accessToken、搜索用户userId 等功能。",
   "main": "index.js",
   "scripts": {
     "search-user": "ts-node scripts/search-user.ts",
-    "update-skill": "node scripts/update-skill-doc.js",
-    "setup-hooks": "sh scripts/setup-hooks.sh",
-    "precommit": "npm run update-skill && git add SKILL.md"
+    "update-skill": "node scripts/update-skill-doc.js"
   },
   "keywords": [
     "dingtalk",

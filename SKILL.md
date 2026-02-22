@@ -5,7 +5,7 @@ description: 调用钉钉开放平台API，实现用户搜索、部门管理等�
 
 # DingTalk API Skill
 
-用于调用钉钉开放平台API的技能，支持 获取企业内部应用的accessToken、搜索用户userId 等功能。
+用于调用钉钉开放平台API的技能，支持用户搜索、部门查询等功能。
 
 ## 前置要求
 
@@ -81,58 +81,3 @@ npx ts-node scripts/search-user.ts "张三"
   }
 }
 ```
-
-## 开发指南
-
-### 自动更新 SKILL.md
-
-修改代码后，运行以下命令自动更新 SKILL.md：
-
-```bash
-npm run update-skill
-```
-
-### 安装 Git Hooks（推荐）
-
-安装 post-commit hook，每次 commit 后自动更新 SKILL.md：
-
-```bash
-npm run setup-hooks
-```
-
-安装后，每次 `git commit` 会自动：
-1. 解析 `scripts/` 目录下的代码变更
-2. 自动更新 SKILL.md
-3. 将更新后的 SKILL.md 追加到当前 commit
-
-### 手动更新
-
-如果不想安装 hooks，可以在 commit 前手动运行：
-
-```bash
-npm run precommit
-```
-
-## 技术说明
-
-本技能基于钉钉开放平台官方 SDK (`@alicloud/dingtalk`) 实现，使用 TypeScript 编写。
-
-### 核心依赖
-
-- `@alicloud/dingtalk` - 钉钉官方 SDK
-- `@alicloud/tea-util` - 阿里云 Tea 工具库
-- `@alicloud/openapi-client` - OpenAPI 客户端
-
-### 认证流程
-
-1. 从系统环境变量读取 `DINGTALK_APP_KEY` 和 `DINGTALK_APP_SECRET`
-2. 调用 `oauth2_1_0.getAccessToken` 接口获取 access_token
-3. 使用获取到的 access_token 调用业务接口
-
-### API 文档参考
-
-- [钉钉开放平台 - 获取访问凭证](https://open.dingtalk.com/document/isvapp-server/obtain-the-access_token-of-an-internal-app)
-- [钉钉开放平台 - 搜索用户](https://open.dingtalk.com/document/isvapp-server/search-for-users)
-
----
-*本文档由 scripts/update-skill-doc.js 自动维护*
