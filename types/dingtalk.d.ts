@@ -23,6 +23,28 @@ declare module '@alicloud/dingtalk/contact_1_0' {
     body?: SearchUserResponseBody;
   }
   
+  export class SearchDepartmentHeaders {
+    xAcsDingtalkAccessToken: string;
+    constructor(init?: Partial<SearchDepartmentHeaders>);
+  }
+
+  export class SearchDepartmentRequest {
+    queryWord?: string;
+    offset?: number;
+    size?: number;
+    constructor(init?: Partial<SearchDepartmentRequest>);
+  }
+
+  export interface SearchDepartmentResponseBody {
+    list?: number[];  // 返回的是部门 ID 列表
+    totalCount?: number;
+    hasMore?: boolean;
+  }
+
+  export interface SearchDepartmentResponse {
+    body?: SearchDepartmentResponseBody;
+  }
+
   export default class Client {
     constructor(config: any);
     searchUserWithOptions(
@@ -30,6 +52,11 @@ declare module '@alicloud/dingtalk/contact_1_0' {
       headers: SearchUserHeaders,
       runtime: any
     ): Promise<SearchUserResponse>;
+    searchDepartmentWithOptions(
+      request: SearchDepartmentRequest,
+      headers: SearchDepartmentHeaders,
+      runtime: any
+    ): Promise<SearchDepartmentResponse>;
   }
 }
 

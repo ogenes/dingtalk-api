@@ -1,13 +1,17 @@
 {
   "name": "dingtalk-api",
-  "version": "1.1.0",
-  "description": "钉钉API调用技能，支持用户搜索、机器人单聊/群聊消息发送、群内机器人列表查询等功能。",
+  "version": "1.2.0",
+  "description": "钉钉API调用技能，支持用户搜索、部门管理（搜索/详情/子部门/用户列表）、机器人单聊/群聊消息发送、群内机器人列表查询等功能。",
   "main": "index.js",
   "scripts": {
     "search-user": "ts-node scripts/search-user.ts",
     "get-bot-list": "ts-node scripts/get-bot-list.ts",
     "send-group-message": "ts-node scripts/send-group-message.ts",
-    "send-user-message": "ts-node scripts/send-user-message.ts"
+    "send-user-message": "ts-node scripts/send-user-message.ts",
+    "search-department": "ts-node scripts/search-department.ts",
+    "get-department": "ts-node scripts/get-department.ts",
+    "list-sub-departments": "ts-node scripts/list-sub-departments.ts",
+    "list-department-users": "ts-node scripts/list-department-users.ts"
   },
   "keywords": [
     "dingtalk",

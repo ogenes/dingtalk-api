@@ -1,11 +1,11 @@
 ---
 name: dingtalk-api
-description: 调用钉钉开放平台API，支持用户搜索、机器人单聊消息发送、群聊消息发送、群内机器人列表查询。Use when needing to search DingTalk users, send robot messages to users or groups, or list bots in a group.
+description: 调用钉钉开放平台API，支持用户搜索、部门管理（搜索/详情/子部门/用户列表）、机器人单聊消息发送、群聊消息发送、群内机器人列表查询。Use when needing to search DingTalk users or departments, get department details/sub-departments/user lists, send robot messages to users or groups, or list bots in a group.
 ---
 
 # DingTalk API Skill
 
-用于调用钉钉开放平台 API 的技能，支持用户搜索、机器人消息发送、群内机器人查询等功能。
+用于调用钉钉开放平台 API 的技能，支持用户搜索、部门管理（搜索/详情/子部门/用户列表）、机器人消息发送、群内机器人查询等功能。
 
 ## 前置要求
 
@@ -41,7 +41,87 @@ npx ts-node scripts/search-user.ts "<搜索关键词>"
 }
 ```
 
-### 2. 发送单聊消息 (send-user-message)
+### 2. 搜索部门 (search-department)
+
+根据名称搜索部门，返回匹配的部门 ID 列表。
+
+```bash
+npx ts-node scripts/search-department.ts "<搜索关键词>" [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "keyword": "技术部",
+  "totalCount": 2,
+  "hasMore": false,
+  "departmentIds": [12345, 67890]
+}
+```
+
+### 3. 获取部门详情 (get-department)
+
+获取指定部门的详细信息。
+
+```bash
+npx ts-node scripts/get-department.ts <deptId> [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "department": {
+    "deptId": 12345,
+    "name": "技术部",
+    "parentId": 1
+  }
+}
+```
+
+### 4. 获取子部门列表 (list-sub-departments)
+
+获取指定部门下的子部门 ID 列表。根部门 deptId 为 1。
+
+```bash
+npx ts-node scripts/list-sub-departments.ts <deptId> [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "deptId": 1,
+  "subDepartmentIds": [12345, 67890, 11111]
+}
+```
+
+### 5. 获取部门用户列表 (list-department-users)
+
+获取指定部门下的用户列表（userId + 姓名），自动分页获取全部用户。
+
+```bash
+npx ts-node scripts/list-department-users.ts <deptId> [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "deptId": 12345,
+  "users": [
+    { "userId": "user001", "name": "张三" },
+    { "userId": "user002", "name": "李四" }
+  ]
+}
+```
+
+### 6. 发送单聊消息 (send-user-message)
 
 通过机器人向指定用户发送单聊消息。
 
@@ -63,7 +143,7 @@ npx ts-node scripts/send-user-message.ts "<userId>" "<robotCode>" "<消息内容
 }
 ```
 
-### 3. 发送群聊消息 (send-group-message)
+### 7. 发送群聊消息 (send-group-message)
 
 通过机器人向指定群会话发送消息。
 
@@ -83,7 +163,7 @@ npx ts-node scripts/send-group-message.ts "<openConversationId>" "<robotCode>" "
 }
 ```
 
-### 4. 获取群内机器人列表 (get-bot-list)
+### 8. 获取群内机器人列表 (get-bot-list)
 
 查询群内已配置的机器人列表。
 
