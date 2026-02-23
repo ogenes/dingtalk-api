@@ -5,7 +5,7 @@ description: 调用钉钉开放平台API，支持用户搜索/详情/查询、�
 
 # DingTalk API Skill
 
-用于调用钉钉开放平台 API 的技能，支持用户搜索/详情/查询、部门管理（搜索/详情/子部门/用户列表/父部门）、机器人消息发送、群内机器人查询、离职记录查询等功能。
+用于调用钉钉开放平台 API 的技能，支持用户搜索/详情/查询、部门管理（搜索/详情/子部门/用户列表/父部门）、机器人消息发送、群内机器人查询、离职记录查询、OA审批管理（查询/发起/审批/转交/评论）等功能。
 
 ## 前置要求
 
@@ -384,6 +384,242 @@ npx ts-node scripts/list-resigned-users.ts "<startTime>" ["<endTime>"] [--nextTo
       "leaveReason": "个人原因"
     }
   ]
+}
+```
+
+### 19. 获取审批实例 ID 列表 (list-approval-instance-ids)
+
+获取指定审批模板在时间段内的审批实例 ID 列表。
+
+```bash
+npx ts-node scripts/list-approval-instance-ids.ts <processCode> --startTime <timestamp> --endTime <timestamp> [--size <size>] [--nextToken <token>] [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "processCode": "PROC-XXX",
+  "instanceIds": ["xxx-123", "xxx-456"],
+  "totalCount": 2,
+  "hasMore": false,
+  "nextToken": null
+}
+```
+
+### 20. 获取审批实例详情 (get-approval-instance)
+
+获取单个审批实例的详细信息，包括表单数据、审批记录、任务列表等。
+
+```bash
+npx ts-node scripts/get-approval-instance.ts <instanceId> [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "instance": {
+    "processInstanceId": "xxx-123",
+    "title": "请假申请",
+    "createTimeGMT": "2024-01-01T00:00:00Z",
+    "finishTimeGMT": "2024-01-01T12:00:00Z",
+    "originatorUserId": "user001",
+    "originatorDeptId": "1",
+    "status": "COMPLETED",
+    "processCode": "PROC-XXX",
+    "formComponentValues": [...],
+    "operationRecords": [...],
+    "tasks": [...]
+  }
+}
+```
+
+### 21. 获取用户发起审批列表 (list-user-initiated-approvals)
+
+获取用户发起的审批实例列表。
+
+```bash
+npx ts-node scripts/list-user-initiated-approvals.ts <userId> [--startTime <timestamp>] [--endTime <timestamp>] [--maxResults <max>] [--nextToken <token>] [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "instances": [...],
+  "totalCount": 5,
+  "hasMore": false,
+  "nextToken": null
+}
+```
+
+### 22. 获取抄送用户审批列表 (list-user-cc-approvals)
+
+获取抄送给用户的审批实例列表。
+
+```bash
+npx ts-node scripts/list-user-cc-approvals.ts <userId> [--startTime <timestamp>] [--endTime <timestamp>] [--maxResults <max>] [--nextToken <token>] [--debug]
+```
+
+### 23. 获取待处理审批列表 (list-user-todo-approvals)
+
+获取用户待处理的审批任务列表。
+
+```bash
+npx ts-node scripts/list-user-todo-approvals.ts <userId> [--maxResults <max>] [--nextToken <token>] [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "instances": [...],
+  "totalCount": 3,
+  "hasMore": false,
+  "nextToken": null
+}
+```
+
+### 24. 获取已处理审批列表 (list-user-done-approvals)
+
+获取用户已处理的审批实例列表。
+
+```bash
+npx ts-node scripts/list-user-done-approvals.ts <userId> [--startTime <timestamp>] [--endTime <timestamp>] [--maxResults <max>] [--nextToken <token>] [--debug]
+```
+
+### 25. 获取待审批数量 (get-user-todo-count)
+
+获取用户待审批任务数量。
+
+```bash
+npx ts-node scripts/get-user-todo-count.ts <userId> [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "count": 5
+}
+```
+
+### 26. 发起审批实例 (create-approval-instance)
+
+创建新的审批实例。
+
+```bash
+npx ts-node scripts/create-approval-instance.ts <processCode> <originatorUserId> <deptId> '<formValuesJson>' [--ccList "user1,user2"] [--debug]
+```
+
+示例：
+
+```bash
+npx ts-node scripts/create-approval-instance.ts "PROC-XXX" "user001" "1" '[{"name":"标题","value":"请假申请"},{"name":"请假天数","value":"3"}]'
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "processCode": "PROC-XXX",
+  "originatorUserId": "user001",
+  "instanceId": "xxx-new"
+}
+```
+
+### 27. 终止审批实例 (terminate-approval-instance)
+
+撤销/终止指定的审批实例。
+
+```bash
+npx ts-node scripts/terminate-approval-instance.ts <instanceId> <operatingUserId> [--remark "撤销原因"] [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "message": "审批实例已终止"
+}
+```
+
+### 28. 执行审批任务 (execute-approval-task)
+
+同意或拒绝审批任务。
+
+```bash
+npx ts-node scripts/execute-approval-task.ts <instanceId> <userId> <agree|refuse> [--taskId <taskId>] [--remark "审批意见"] [--debug]
+```
+
+示例：
+
+```bash
+npx ts-node scripts/execute-approval-task.ts "xxx-123" "user001" "agree" --remark "同意申请"
+npx ts-node scripts/execute-approval-task.ts "xxx-123" "user001" "refuse" --remark "条件不符"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "action": "agree",
+  "message": "已同意审批"
+}
+```
+
+### 29. 转交审批任务 (transfer-approval-task)
+
+将审批任务转交给其他用户处理。
+
+```bash
+npx ts-node scripts/transfer-approval-task.ts <instanceId> <userId> <transferToUserId> [--taskId <taskId>] [--remark "转交原因"] [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "transferToUserId": "user002",
+  "message": "审批任务已转交"
+}
+```
+
+### 30. 添加审批评论 (add-approval-comment)
+
+为审批实例添加评论。
+
+```bash
+npx ts-node scripts/add-approval-comment.ts <instanceId> <userId> "<comment>" [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "message": "评论已添加"
 }
 ```
 

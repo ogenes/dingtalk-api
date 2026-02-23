@@ -2,7 +2,7 @@
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-已发布-blue)](https://clawhub.com/ogenes/dingtalk-api)
 
-钉钉开放平台 API 调用技能，支持用户搜索/详情/查询、部门管理（搜索/详情/子部门/用户列表/父部门）、机器人单聊/群聊消息发送、群内机器人列表查询、离职记录查询等功能。
+钉钉开放平台 API 调用技能，支持用户搜索/详情/查询、部门管理（搜索/详情/子部门/用户列表/父部门）、机器人单聊/群聊消息发送、群内机器人列表查询、离职记录查询、OA审批管理（查询/发起/审批/转交/评论）等功能。
 
 > **已发布到 [ClawHub](https://clawhub.com/ogenes/dingtalk-api)**，可通过 `clawhub install dingtalk-api` 一键安装。
 
@@ -30,6 +30,20 @@
 - **单聊消息** - 通过机器人向指定用户发送单聊消息
 - **群聊消息** - 通过机器人向指定群会话发送消息
 - **机器人列表** - 查询群内已配置的机器人列表
+
+### OA审批管理
+- **审批实例 ID 列表** - 获取指定审批模板在时间段内的实例 ID 列表
+- **审批实例详情** - 获取单个审批实例的详细信息
+- **用户发起审批** - 获取用户发起的审批列表
+- **抄送用户审批** - 获取抄送用户的审批列表
+- **待处理审批** - 获取用户待处理的审批列表
+- **已处理审批** - 获取用户已处理的审批列表
+- **待审批数量** - 获取用户待审批任务数量
+- **发起审批** - 创建新的审批实例
+- **终止审批** - 撤销/终止审批实例
+- **执行任务** - 同意或拒绝审批任务
+- **转交任务** - 将审批任务转交给其他用户
+- **添加评论** - 为审批实例添加评论
 
 ### 技术特性
 - **自动认证** - 自动获取 access_token，无需手动管理
@@ -214,7 +228,187 @@ npm run get-bot-list -- "<openConversationId>"
 
 所有命令支持 `--debug` 参数查看完整 API 响应。
 
-### 9. 获取用户详情
+### 9. 获取审批实例 ID 列表
+
+```bash
+npm run list-approval-instance-ids -- "PROC-XXX" --startTime 1704067200000 --endTime 1706745600000
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "processCode": "PROC-XXX",
+  "instanceIds": ["xxx-123", "xxx-456"],
+  "totalCount": 2,
+  "hasMore": false
+}
+```
+
+### 10. 获取审批实例详情
+
+```bash
+npm run get-approval-instance -- "xxx-123"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "instance": {
+    "processInstanceId": "xxx-123",
+    "title": "请假申请",
+    "createTimeGMT": "2024-01-01T00:00:00Z",
+    "originatorUserId": "user001",
+    "status": "COMPLETED",
+    "formComponentValues": [...]
+  }
+}
+```
+
+### 11. 获取用户发起的审批列表
+
+```bash
+npm run list-user-initiated-approvals -- "user001" --startTime 1704067200000 --endTime 1706745600000
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "instances": [...],
+  "totalCount": 5,
+  "hasMore": false
+}
+```
+
+### 12. 获取用户待处理审批列表
+
+```bash
+npm run list-user-todo-approvals -- "user001"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "instances": [...],
+  "totalCount": 3,
+  "hasMore": false
+}
+```
+
+### 13. 获取用户待审批数量
+
+```bash
+npm run get-user-todo-count -- "user001"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "user001",
+  "count": 5
+}
+```
+
+### 14. 发起审批实例
+
+```bash
+npm run create-approval-instance -- "PROC-XXX" "user001" "1" '[{"name":"标题","value":"测试审批"}]'
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "processCode": "PROC-XXX",
+  "originatorUserId": "user001",
+  "instanceId": "xxx-new"
+}
+```
+
+### 15. 终止审批实例
+
+```bash
+npm run terminate-approval-instance -- "xxx-123" "user001" --remark "撤销原因"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "message": "审批实例已终止"
+}
+```
+
+### 16. 执行审批任务（同意/拒绝）
+
+```bash
+npm run execute-approval-task -- "xxx-123" "user001" "agree" --remark "同意"
+npm run execute-approval-task -- "xxx-123" "user001" "refuse" --remark "拒绝原因"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "action": "agree",
+  "message": "已同意审批"
+}
+```
+
+### 17. 转交审批任务
+
+```bash
+npm run transfer-approval-task -- "xxx-123" "user001" "user002" --remark "转交给他人处理"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "transferToUserId": "user002",
+  "message": "审批任务已转交"
+}
+```
+
+### 18. 添加审批评论
+
+```bash
+npm run add-approval-comment -- "xxx-123" "user001" "这是一条评论"
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "instanceId": "xxx-123",
+  "userId": "user001",
+  "message": "评论已添加"
+}
+```
+
+### 19. 获取用户详情
 
 ```bash
 npm run get-user -- "user001"
@@ -409,24 +603,36 @@ npm run list-resigned-users -- "2024-01-01T00:00:00+08:00" "2024-02-01T00:00:00+
 ```
 dingtalk-api/
 ├── scripts/
-│   ├── search-user.ts                  # 用户搜索
-│   ├── get-user.ts                     # 用户详情
-│   ├── list-user-parent-departments.ts # 用户父部门列表
-│   ├── get-user-by-mobile.ts           # 手机号查用户
-│   ├── get-user-by-unionid.ts          # unionid查用户
-│   ├── get-user-count.ts               # 员工人数
-│   ├── list-inactive-users.ts          # 未登录用户列表
-│   ├── list-resigned-users.ts          # 离职记录列表
-│   ├── search-department.ts            # 部门搜索
-│   ├── get-department.ts               # 部门详情
-│   ├── list-department-parents.ts      # 部门父部门列表
-│   ├── list-sub-departments.ts         # 子部门列表
-│   ├── list-department-users.ts        # 部门用户列表
-│   ├── list-department-user-ids.ts     # 部门用户ID列表
-│   ├── list-department-user-details.ts # 部门用户详情（分页）
-│   ├── send-user-message.ts            # 单聊消息发送
-│   ├── send-group-message.ts           # 群聊消息发送
-│   └── get-bot-list.ts                 # 群内机器人列表
+│   ├── search-user.ts                       # 用户搜索
+│   ├── get-user.ts                          # 用户详情
+│   ├── list-user-parent-departments.ts      # 用户父部门列表
+│   ├── get-user-by-mobile.ts                # 手机号查用户
+│   ├── get-user-by-unionid.ts               # unionid查用户
+│   ├── get-user-count.ts                    # 员工人数
+│   ├── list-inactive-users.ts               # 未登录用户列表
+│   ├── list-resigned-users.ts               # 离职记录列表
+│   ├── search-department.ts                 # 部门搜索
+│   ├── get-department.ts                    # 部门详情
+│   ├── list-department-parents.ts           # 部门父部门列表
+│   ├── list-sub-departments.ts              # 子部门列表
+│   ├── list-department-users.ts             # 部门用户列表
+│   ├── list-department-user-ids.ts          # 部门用户ID列表
+│   ├── list-department-user-details.ts      # 部门用户详情（分页）
+│   ├── send-user-message.ts                 # 单聊消息发送
+│   ├── send-group-message.ts                # 群聊消息发送
+│   ├── get-bot-list.ts                      # 群内机器人列表
+│   ├── list-approval-instance-ids.ts        # 审批实例 ID 列表
+│   ├── get-approval-instance.ts             # 审批实例详情
+│   ├── list-user-initiated-approvals.ts     # 用户发起审批列表
+│   ├── list-user-cc-approvals.ts            # 抄送用户审批列表
+│   ├── list-user-todo-approvals.ts          # 待处理审批列表
+│   ├── list-user-done-approvals.ts          # 已处理审批列表
+│   ├── get-user-todo-count.ts               # 待审批数量
+│   ├── create-approval-instance.ts          # 发起审批
+│   ├── terminate-approval-instance.ts       # 终止审批
+│   ├── execute-approval-task.ts             # 执行审批任务
+│   ├── transfer-approval-task.ts            # 转交审批任务
+│   └── add-approval-comment.ts              # 添加审批评论
 ├── types/
 │   └── dingtalk.d.ts               # 钉钉 SDK 类型定义
 ├── SKILL.md                        # Skill 文档
@@ -463,6 +669,19 @@ dingtalk-api/
 
 ### 认证
 - [获取企业内部应用的 accessToken](https://open.dingtalk.com/document/orgapp/obtain-the-access_token-of-an-internal-app)
+
+### OA审批
+- [获取审批实例ID列表](https://open.dingtalk.com/document/isvapp-server/obtain-the-list-of-approval-instance-ids)
+- [获取单个审批实例详情](https://open.dingtalk.com/document/isvapp-server/get-details-of-a-single-approval-instance)
+- [获取用户待审批数量](https://open.dingtalk.com/document/isvapp-server/obtains-the-number-of-to-dos-for-a-user)
+- [获取用户已发起审批列表](https://open.dingtalk.com/document/isvapp-server/get-user-initiated-approval-list)
+- [获取用户待处理审批列表](https://open.dingtalk.com/document/isvapp-server/get-user-to-do-approval-list)
+- [获取用户已处理审批列表](https://open.dingtalk.com/document/isvapp-server/get-user-processed-approval-list)
+- [获取用户抄送审批列表](https://open.dingtalk.com/document/isvapp-server/get-list-of-approval-copied-to-user)
+- [创建审批实例](https://open.dingtalk.com/document/isvapp-server/create-an-approval-instance)
+- [撤销审批实例](https://open.dingtalk.com/document/isvapp-server/cancel-an-approval-instance)
+- [执行审批操作](https://open.dingtalk.com/document/isvapp-server/execute-approval-operation)
+- [添加审批评论](https://open.dingtalk.com/document/isvapp-server/add-approval-comments)
 
 ## 许可证
 
