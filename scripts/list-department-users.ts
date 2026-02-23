@@ -73,11 +73,10 @@ async function getAccessToken(appKey: string, appSecret: string): Promise<string
 async function dingtalkRequest(accessToken: string, method: string, path: string, body?: any): Promise<any> {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'api.dingtalk.com',
-      path: `/v1.0${path}`,
+      hostname: 'oapi.dingtalk.com',
+      path: `${path}?access_token=${accessToken}`,
       method,
       headers: {
-        'x-acs-dingtalk-access-token': accessToken,
         'Content-Type': 'application/json',
       } as Record<string, string>,
     };
@@ -87,8 +86,13 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
       res.on('end', () => {
         try {
           const parsed = JSON.parse(data);
-          if (res.statusCode && res.statusCode >= 400) reject(parsed);
-          else resolve(parsed);
+          if (parsed.errcode !== undefined && parsed.errcode !== 0) {
+            reject({ code: parsed.errcode, message: parsed.errmsg });
+          } else if (res.statusCode && res.statusCode >= 400) {
+            reject(parsed);
+          } else {
+            resolve(parsed);
+          }
         } catch {
           reject(new Error(`Invalid JSON response: ${data}`));
         }
@@ -108,9 +112,9 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
  */
 async function listDepartmentUsers(accessToken: string, deptId: number, debug: boolean = false): Promise<void> {
   try {
-    // 钉钉 API: POST /v1.0/contact/departments/listUserIds
+    // 钉钉 TOP API: POST /topapi/v2/user/list
     // 请求体: { "dept_id": number, "cursor": number, "size": number }
-    let allUserIds: string[] = [];
+    let allUsers: SimpleUser[] = [];
     let cursor = 0;
     let hasMore = true;
 
@@ -118,7 +122,7 @@ async function listDepartmentUsers(accessToken: string, deptId: number, debug: b
       const response = await dingtalkRequest(
         accessToken,
         'POST',
-        '/contact/departments/listUserIds',
+        '/topapi/v2/user/list',
         { dept_id: deptId, cursor: cursor, size: 100 }
       );
 
@@ -129,27 +133,22 @@ async function listDepartmentUsers(accessToken: string, deptId: number, debug: b
         console.error('==============\n');
       }
 
-      const userIds = response.result?.list || [];
-      allUserIds = allUserIds.concat(userIds);
+      const users = response.result?.list || [];
+      allUsers = allUsers.concat(users.map((u: any) => ({
+        userId: u.userid,
+        name: u.name,
+      })));
 
-      hasMore = response.result?.hasMore || false;
+      hasMore = response.result?.has_more || false;
       if (hasMore) {
-        cursor = response.result?.nextCursor || 0;
+        cursor = response.result?.next_cursor || 0;
       }
     }
-
-    // 获取用户姓名信息（根据 userId 获取详情）
-    // 注意：listUserIds 只返回 userId，如需姓名需要额外调用
-    // 这里先返回 userId 列表
-    const users: SimpleUser[] = allUserIds.map((userId: string) => ({
-      userId: userId,
-      name: '', // listUserIds API 只返回 ID，如需姓名需额外调用
-    }));
 
     const result: SuccessResult = {
       success: true,
       deptId: deptId,
-      users: users,
+      users: allUsers,
     };
 
     console.log(JSON.stringify(result, null, 2));

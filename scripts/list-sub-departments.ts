@@ -69,11 +69,10 @@ async function getAccessToken(appKey: string, appSecret: string): Promise<string
 async function dingtalkRequest(accessToken: string, method: string, path: string, body?: any): Promise<any> {
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: 'api.dingtalk.com',
-      path: `/v1.0${path}`,
+      hostname: 'oapi.dingtalk.com',
+      path: `${path}?access_token=${accessToken}`,
       method,
       headers: {
-        'x-acs-dingtalk-access-token': accessToken,
         'Content-Type': 'application/json',
       } as Record<string, string>,
     };
@@ -83,8 +82,13 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
       res.on('end', () => {
         try {
           const parsed = JSON.parse(data);
-          if (res.statusCode && res.statusCode >= 400) reject(parsed);
-          else resolve(parsed);
+          if (parsed.errcode !== undefined && parsed.errcode !== 0) {
+            reject({ code: parsed.errcode, message: parsed.errmsg });
+          } else if (res.statusCode && res.statusCode >= 400) {
+            reject(parsed);
+          } else {
+            resolve(parsed);
+          }
         } catch {
           reject(new Error(`Invalid JSON response: ${data}`));
         }
@@ -104,12 +108,12 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
  */
 async function listSubDepartments(accessToken: string, deptId: number, debug: boolean = false): Promise<void> {
   try {
-    // 钉钉 API: POST /v1.0/contact/departments/listSubIds
+    // 钉钉 TOP API: POST /topapi/v2/department/listsub
     // 请求体: { "dept_id": number }
     const response = await dingtalkRequest(
       accessToken,
       'POST',
-      '/contact/departments/listSubIds',
+      '/topapi/v2/department/listsub',
       { dept_id: deptId }
     );
 
@@ -123,7 +127,7 @@ async function listSubDepartments(accessToken: string, deptId: number, debug: bo
     const result: SuccessResult = {
       success: true,
       deptId: deptId,
-      subDepartmentIds: response.result || [],
+      subDepartmentIds: (response.result || []).map((d: any) => d.dept_id),
     };
 
     console.log(JSON.stringify(result, null, 2));

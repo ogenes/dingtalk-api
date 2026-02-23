@@ -129,13 +129,11 @@ npm run list-department-users -- 12345
   "success": true,
   "deptId": 12345,
   "users": [
-    { "userId": "user001", "name": "" },
-    { "userId": "user002", "name": "" }
+    { "userId": "user001", "name": "张三" },
+    { "userId": "user002", "name": "李四" }
   ]
 }
 ```
-
-> **注意**：`listUserIds` API 只返回 userId，如需获取用户姓名请使用 `search-user` 脚本查询。
 
 ### 6. 发送单聊消息
 
