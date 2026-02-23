@@ -1,11 +1,13 @@
 {
   "name": "dingtalk-api",
-  "version": "1.0.3",
-  "description": "钉钉API调用技能，支持 获取企业内部应用的accessToken、搜索用户userId 等功能。",
+  "version": "1.1.0",
+  "description": "钉钉API调用技能，支持用户搜索、机器人单聊/群聊消息发送、群内机器人列表查询等功能。",
   "main": "index.js",
   "scripts": {
     "search-user": "ts-node scripts/search-user.ts",
-    "update-skill": "node scripts/update-skill-doc.js"
+    "get-bot-list": "ts-node scripts/get-bot-list.ts",
+    "send-group-message": "ts-node scripts/send-group-message.ts",
+    "send-user-message": "ts-node scripts/send-user-message.ts"
   },
   "keywords": [
     "dingtalk",

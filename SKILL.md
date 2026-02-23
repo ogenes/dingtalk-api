@@ -1,83 +1,129 @@
 ---
 name: dingtalk-api
-description: 调用钉钉开放平台API，实现用户搜索、部门管理等功能。从系统环境变量读取应用凭证。Use when needing to interact with DingTalk API, search users by name, get user details, or manage organizational contacts.
+description: 调用钉钉开放平台API，支持用户搜索、机器人单聊消息发送、群聊消息发送、群内机器人列表查询。Use when needing to search DingTalk users, send robot messages to users or groups, or list bots in a group.
 ---
 
 # DingTalk API Skill
 
-用于调用钉钉开放平台API的技能，支持用户搜索、部门查询等功能。
+用于调用钉钉开放平台 API 的技能，支持用户搜索、机器人消息发送、群内机器人查询等功能。
 
 ## 前置要求
 
-- 钉钉应用已创建并拥有以下权限：
-  - `qyapi_addresslist_search` - 搜索企业通讯录的权限
-- 已获取应用的 **AppKey** 和 **AppSecret**
 - 已设置环境变量 `DINGTALK_APP_KEY` 和 `DINGTALK_APP_SECRET`
+- 钉钉应用已创建并拥有相应 API 权限
 
 ## 环境变量配置
-
-在使用脚本前，需要导出以下环境变量：
 
 ```bash
 export DINGTALK_APP_KEY="<your-app-key>"
 export DINGTALK_APP_SECRET="<your-app-secret>"
-```
-
-或者在一行中执行：
-
-```bash
-export DINGTALK_APP_KEY="<your-app-key>" && export DINGTALK_APP_SECRET="<your-app-secret>" && npx ts-node scripts/search-user.ts "搜索关键词"
 ```
 
 ## 功能列表
 
-### 1. 搜索用户 (searchUser)
+### 1. 搜索用户 (search-user)
 
-根据姓名搜索用户，返回匹配的 UserId 列表。脚本会自动获取 access_token。
-
-**使用方式:**
+根据姓名搜索用户，返回匹配的 UserId 列表。
 
 ```bash
-cd ~/Data/www/dingtalk-api
-export DINGTALK_APP_KEY="<your-app-key>"
-export DINGTALK_APP_SECRET="<your-app-secret>"
 npx ts-node scripts/search-user.ts "<搜索关键词>"
 ```
 
-**示例:**
-
-```bash
-export DINGTALK_APP_KEY="<your-app-key>"
-export DINGTALK_APP_SECRET="<your-app-secret>"
-npx ts-node scripts/search-user.ts "张三"
-```
-
-**输出:**
+输出：
 
 ```json
 {
   "success": true,
-  "keyword": "<搜索关键词>",
+  "keyword": "张三",
   "totalCount": 3,
   "hasMore": false,
-  "userIds": [
-    "123456789",
-    "987654321",
-    "456789123"
+  "userIds": ["123456789", "987654321"]
+}
+```
+
+### 2. 发送单聊消息 (send-user-message)
+
+通过机器人向指定用户发送单聊消息。
+
+```bash
+npx ts-node scripts/send-user-message.ts "<userId>" "<robotCode>" "<消息内容>" [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "userId": "123456",
+  "robotCode": "robot_code",
+  "processQueryKey": "query_key",
+  "flowControlledStaffIdList": [],
+  "invalidStaffIdList": [],
+  "message": "消息内容"
+}
+```
+
+### 3. 发送群聊消息 (send-group-message)
+
+通过机器人向指定群会话发送消息。
+
+```bash
+npx ts-node scripts/send-group-message.ts "<openConversationId>" "<robotCode>" "<消息内容>" [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "openConversationId": "cid",
+  "robotCode": "robot_code",
+  "processQueryKey": "query_key",
+  "message": "消息内容"
+}
+```
+
+### 4. 获取群内机器人列表 (get-bot-list)
+
+查询群内已配置的机器人列表。
+
+```bash
+npx ts-node scripts/get-bot-list.ts "<openConversationId>" [--debug]
+```
+
+输出：
+
+```json
+{
+  "success": true,
+  "openConversationId": "cid",
+  "botList": [
+    {
+      "robotCode": "code",
+      "robotName": "name",
+      "robotAvatar": "url",
+      "openRobotType": 1
+    }
   ]
 }
 ```
 
-> **注意:** 钉钉搜索用户 API 返回的是匹配用户的 **userid 列表**。
+## 错误处理
 
-**错误输出:**
+所有脚本在错误时返回统一格式：
 
 ```json
 {
   "success": false,
   "error": {
-    "code": "MISSING_CREDENTIALS",
-    "message": "缺少钉钉应用凭证，请设置环境变量 DINGTALK_APP_KEY 和 DINGTALK_APP_SECRET"
+    "code": "ERROR_CODE",
+    "message": "错误描述"
   }
 }
 ```
+
+常见错误码：
+- `MISSING_CREDENTIALS` - 未设置环境变量
+- `INVALID_ARGUMENTS` - 参数不足
+- `AUTH_FAILED` - access_token 获取失败
+- `UNKNOWN_ERROR` - API 调用异常
