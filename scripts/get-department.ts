@@ -115,7 +115,14 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
  */
 async function getDepartment(accessToken: string, deptId: number, debug: boolean = false): Promise<void> {
   try {
-    const response = await dingtalkRequest(accessToken, 'GET', `/contact/departments/${deptId}`);
+    // 钉钉 API: POST /v1.0/contact/departments/get
+    // 请求体: { "dept_id": number }
+    const response = await dingtalkRequest(
+      accessToken,
+      'POST',
+      '/contact/departments/get',
+      { dept_id: deptId }
+    );
 
     // 调试模式：输出完整响应
     if (debug) {

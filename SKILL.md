@@ -102,7 +102,7 @@ npx ts-node scripts/list-sub-departments.ts <deptId> [--debug]
 
 ### 5. 获取部门用户列表 (list-department-users)
 
-获取指定部门下的用户列表（userId + 姓名），自动分页获取全部用户。
+获取指定部门下的用户 ID 列表，自动分页获取全部用户。
 
 ```bash
 npx ts-node scripts/list-department-users.ts <deptId> [--debug]
@@ -115,11 +115,13 @@ npx ts-node scripts/list-department-users.ts <deptId> [--debug]
   "success": true,
   "deptId": 12345,
   "users": [
-    { "userId": "user001", "name": "张三" },
-    { "userId": "user002", "name": "李四" }
+    { "userId": "user001", "name": "" },
+    { "userId": "user002", "name": "" }
   ]
 }
 ```
+
+> **注意**：`listUserIds` API 只返回 userId，如需获取用户姓名请使用 `search-user` 脚本查询。
 
 ### 6. 发送单聊消息 (send-user-message)
 

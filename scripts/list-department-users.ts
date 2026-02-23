@@ -108,15 +108,18 @@ async function dingtalkRequest(accessToken: string, method: string, path: string
  */
 async function listDepartmentUsers(accessToken: string, deptId: number, debug: boolean = false): Promise<void> {
   try {
-    let allUsers: SimpleUser[] = [];
+    // 钉钉 API: POST /v1.0/contact/departments/listUserIds
+    // 请求体: { "dept_id": number, "cursor": number, "size": number }
+    let allUserIds: string[] = [];
     let cursor = 0;
     let hasMore = true;
 
     while (hasMore) {
       const response = await dingtalkRequest(
         accessToken,
-        'GET',
-        `/contact/departments/${deptId}/simpleUsers?departmentId=${deptId}&cursor=${cursor}&size=100`
+        'POST',
+        '/contact/departments/listUserIds',
+        { dept_id: deptId, cursor: cursor, size: 100 }
       );
 
       // 调试模式：输出完整响应
@@ -126,11 +129,8 @@ async function listDepartmentUsers(accessToken: string, deptId: number, debug: b
         console.error('==============\n');
       }
 
-      const users = response.result?.list || [];
-      allUsers = allUsers.concat(users.map((u: any) => ({
-        userId: u.userId,
-        name: u.name,
-      })));
+      const userIds = response.result?.list || [];
+      allUserIds = allUserIds.concat(userIds);
 
       hasMore = response.result?.hasMore || false;
       if (hasMore) {
@@ -138,10 +138,18 @@ async function listDepartmentUsers(accessToken: string, deptId: number, debug: b
       }
     }
 
+    // 获取用户姓名信息（根据 userId 获取详情）
+    // 注意：listUserIds 只返回 userId，如需姓名需要额外调用
+    // 这里先返回 userId 列表
+    const users: SimpleUser[] = allUserIds.map((userId: string) => ({
+      userId: userId,
+      name: '', // listUserIds API 只返回 ID，如需姓名需额外调用
+    }));
+
     const result: SuccessResult = {
       success: true,
       deptId: deptId,
-      users: allUsers,
+      users: users,
     };
 
     console.log(JSON.stringify(result, null, 2));
