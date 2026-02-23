@@ -1,7 +1,7 @@
 {
   "name": "dingtalk-api",
-  "version": "1.2.0",
-  "description": "钉钉API调用技能，支持用户搜索、部门管理（搜索/详情/子部门/用户列表）、机器人单聊/群聊消息发送、群内机器人列表查询等功能。",
+  "version": "1.3.0",
+  "description": "钉钉API调用技能，支持用户搜索/详情/查询、部门管理（搜索/详情/子部门/用户列表/父部门）、机器人单聊/群聊消息发送、群内机器人列表查询、离职记录查询等功能。",
   "main": "index.js",
   "scripts": {
     "search-user": "ts-node scripts/search-user.ts",
@@ -11,7 +11,17 @@
     "search-department": "ts-node scripts/search-department.ts",
     "get-department": "ts-node scripts/get-department.ts",
     "list-sub-departments": "ts-node scripts/list-sub-departments.ts",
-    "list-department-users": "ts-node scripts/list-department-users.ts"
+    "list-department-users": "ts-node scripts/list-department-users.ts",
+    "list-department-parents": "ts-node scripts/list-department-parents.ts",
+    "list-user-parent-departments": "ts-node scripts/list-user-parent-departments.ts",
+    "get-user": "ts-node scripts/get-user.ts",
+    "list-department-user-details": "ts-node scripts/list-department-user-details.ts",
+    "list-department-user-ids": "ts-node scripts/list-department-user-ids.ts",
+    "get-user-count": "ts-node scripts/get-user-count.ts",
+    "list-inactive-users": "ts-node scripts/list-inactive-users.ts",
+    "get-user-by-mobile": "ts-node scripts/get-user-by-mobile.ts",
+    "get-user-by-unionid": "ts-node scripts/get-user-by-unionid.ts",
+    "list-resigned-users": "ts-node scripts/list-resigned-users.ts"
   },
   "keywords": [
     "dingtalk",

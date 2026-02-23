@@ -2,7 +2,7 @@
 
 ## 发布流程
 
-每次代码改动完成后，自动执行以下步骤：
+用户要求发布代码时，自动执行以下步骤：
 
 1. **重构文档** - 更新 README.md 和 SKILL.md，确保与当前功能一致
 2. **更新 package.json** - 递增 version（遵循 semver），更新 description 与功能匹配
