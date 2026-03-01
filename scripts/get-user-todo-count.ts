@@ -3,7 +3,7 @@
 // 需要设置环境变量 DINGTALK_APP_KEY 和 DINGTALK_APP_SECRET
 export {};
 
-const { default: dingtalkWorkflow, GetTodoNumHeaders, GetTodoNumRequest } = require('@alicloud/dingtalk/workflow_1_0');
+const { default: dingtalkWorkflow, GetUserTodoTaskSumHeaders, GetUserTodoTaskSumRequest } = require('@alicloud/dingtalk/workflow_1_0');
 const { default: dingtalkOauth2_1_0, GetAccessTokenRequest } = require('@alicloud/dingtalk/oauth2_1_0');
 const { Config } = require('@alicloud/openapi-client');
 const { RuntimeOptions } = require('@alicloud/tea-util');
@@ -59,15 +59,15 @@ async function getUserTodoCount(
 ): Promise<void> {
   const client = new dingtalkWorkflow(createConfig());
 
-  const headers = new GetTodoNumHeaders({});
+  const headers = new GetUserTodoTaskSumHeaders({});
   headers.xAcsDingtalkAccessToken = accessToken;
 
-  const request = new GetTodoNumRequest({
+  const request = new GetUserTodoTaskSumRequest({
     userId: userId,
   });
 
   try {
-    const response = await client.getTodoNumWithOptions(
+    const response = await client.getUserTodoTaskSumWithOptions(
       request,
       headers,
       new RuntimeOptions({})

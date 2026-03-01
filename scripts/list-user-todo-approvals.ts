@@ -3,7 +3,7 @@
 // 需要设置环境变量 DINGTALK_APP_KEY 和 DINGTALK_APP_SECRET
 export {};
 
-const { default: dingtalkWorkflow, ListUserTodoProcessInstancesHeaders, ListUserTodoProcessInstancesRequest } = require('@alicloud/dingtalk/workflow_1_0');
+const { default: dingtalkWorkflow, ListTodoWorkRecordsHeaders, ListTodoWorkRecordsRequest } = require('@alicloud/dingtalk/workflow_1_0');
 const { default: dingtalkOauth2_1_0, GetAccessTokenRequest } = require('@alicloud/dingtalk/oauth2_1_0');
 const { Config } = require('@alicloud/openapi-client');
 const { RuntimeOptions } = require('@alicloud/tea-util');
@@ -64,17 +64,17 @@ async function listUserTodoApprovals(
 ): Promise<void> {
   const client = new dingtalkWorkflow(createConfig());
 
-  const headers = new ListUserTodoProcessInstancesHeaders({});
+  const headers = new ListTodoWorkRecordsHeaders({});
   headers.xAcsDingtalkAccessToken = accessToken;
 
-  const request = new ListUserTodoProcessInstancesRequest({
+  const request = new ListTodoWorkRecordsRequest({
     userId: userId,
     maxResults: maxResults,
     nextToken: nextToken,
   });
 
   try {
-    const response = await client.listUserTodoProcessInstancesWithOptions(
+    const response = await client.listTodoWorkRecordsWithOptions(
       request,
       headers,
       new RuntimeOptions({})
